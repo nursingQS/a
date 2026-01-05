@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alzheimer's Disease Flashcards</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e6f2ff 100%);
+            min-height: 100vh;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            height: 96vh;
+            background: #f9fbff;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(182, 193, 255, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 3px solid #b6c1ff;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #85a2ff, #b6c1ff);
+            color: white;
+            padding: 12px 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.1"><path d="M50,20 Q70,30 80,50 Q70,70 50,80 Q30,70 20,50 Q30,30 50,20 Z" fill="white"/><circle cx="50" cy="50" r="15" fill="white"/><path d="M40,35 L60,35 L60,65 L40,65 Z" fill="white"/><polygon points="50,20 60,40 50,50 40,40" fill="white"/></svg>');
+            background-size: 80px 80px;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+            position: relative;
+            color: #f0f7ff;
+            line-height: 1.2;
+        }
+        
+        .header .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            position: relative;
+            color: #e6f2ff;
+            margin-bottom: 8px;
+        }
+        
+        .progress {
+            background: #85a2ff;
+            height: 6px;
+            width: 100%;
+            flex-shrink: 0;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #ccd5ff, #85a2ff);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .section-nav {
+            display: flex;
+            gap: 6px;
+            padding: 8px 10px;
+            background: linear-gradient(135deg, #4d79ff, #85a2ff);
+            border-bottom: 1px solid #ccd5ff;
+            flex-shrink: 0;
+            overflow-x: auto;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .section-btn {
+            padding: 5px 10px;
+            border: 2px solid #ccd5ff;
+            background: rgba(255, 255, 255, 0.95);
+            color: #4d79ff;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .section-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(204, 213, 255, 0.4);
+        }
+        
+        .section-btn.active {
+            background: linear-gradient(135deg, #ccd5ff, #85a2ff);
+            color: white;
+            border-color: #4d79ff;
+            box-shadow: 0 6px 12px rgba(204, 213, 255, 0.5);
+        }
+        
+        .flashcard {
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f9fbff;
+            overflow: hidden;
+            min-height: 0;
+        }
+        
+        .question-container {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 6px solid #ccd5ff;
+            box-shadow: 0 4px 8px rgba(182, 193, 255, 0.1);
+            flex-shrink: 0;
+        }
+        
+        .question-icon {
+            background: linear-gradient(135deg, #4d79ff, #85a2ff);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            flex-shrink: 0;
+            box-shadow: 0 4px 8px rgba(77, 121, 255, 0.4);
+        }
+        
+        .question {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: #3366cc;
+            flex-grow: 1;
+            font-weight: 500;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+        
+        .multiple-select-indicator {
+            background: #3366ff;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 6px;
+            white-space: nowrap;
+            box-shadow: 0 3px 6px rgba(51, 102, 255, 0.3);
+            flex-shrink: 0;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 8px;
+            flex: 1;
+            overflow: hidden;
+            min-height: 0;
+        }
+        
+        .option {
+            padding: 8px 10px;
+            border: 2px solid #dde1ff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            flex-shrink: 0;
+            min-height: 45px;
+        }
+        
+        .option:hover {
+            background: #f0f7ff;
+            border-color: #ccd5ff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(204, 213, 255, 0.2);
+        }
+        
+        .option-letter {
+            background: #dde1ff;
+            color: #4d79ff;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            border: 2px solid #ccd5ff;
+        }
+        
+        /* CORRECT - ALWAYS GREEN */
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .option.correct .option-letter {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        
+        /* INCORRECT - ALWAYS RED */
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .option.incorrect .option-letter {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        
+        .option.selected {
+            background: #f0f7ff;
+            border-color: #ccd5ff;
+            color: #4d79ff;
+        }
+        
+        .option.selected .option-letter {
+            background: #ccd5ff;
+            color: #4d79ff;
+            border-color: #85a2ff;
+        }
+        
+        .feedback {
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        
+        .feedback.correct {
+            background: #d4edda;
+            border: 3px solid #28a745;
+            color: #155724;
+            display: flex;
+        }
+        
+        .feedback.incorrect {
+            background: #f8d7da;
+            border: 3px solid #dc3545;
+            color: #721c24;
+            display: flex;
+        }
+        
+        .feedback-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: #dde1ff;
+            border-top: 2px solid #ccd5ff;
+            flex-shrink: 0;
+            gap: 8px;
+        }
+        
+        .counter {
+            font-weight: bold;
+            color: #4d79ff;
+            font-size: 0.9rem;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            border: 2px solid #ccd5ff;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4d79ff, #85a2ff);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(77, 121, 255, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #85a2ff, #4d79ff);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(133, 162, 255, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffcc00, #ff9900);
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(255, 204, 0, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff3366, #cc0044);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(255, 51, 102, 0.4);
+        }
+        
+        .rationale {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 3px solid #ffcc00;
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 8px;
+            display: none;
+            box-shadow: 0 4px 12px rgba(255, 204, 0, 0.2);
+            flex-shrink: 0;
+            overflow: hidden;
+            max-height: 120px;
+        }
+        
+        .rationale.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        
+        .rationale h4 {
+            color: #ff9900;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .rationale p {
+            color: #856404;
+            line-height: 1.4;
+            font-size: 0.8rem;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stats {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-top: 4px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        
+        .stat {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .cancel-selection {
+            background: linear-gradient(135deg, #ff3366, #cc0044);
+            color: white;
+            margin: 0 auto 8px auto;
+            display: none;
+            box-shadow: 0 4px 10px rgba(255, 51, 102, 0.3);
+            flex-shrink: 0;
+        }
+        
+        .cancel-selection:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(255, 51, 102, 0.4);
+        }
+        
+        .cancel-selection.show {
+            display: flex;
+        }
+        
+        .multiple-select-instructions {
+            text-align: center;
+            color: #3366ff;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            background: #fff3cd;
+            padding: 6px;
+            border-radius: 8px;
+            border: 2px solid #ffeaa7;
+            flex-shrink: 0;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        }
+        
+        /* Remove all scrollbars */
+        .options,
+        .rationale,
+        .container,
+        .flashcard,
+        body {
+            overflow: hidden !important;
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
+        }
+        
+        .options::-webkit-scrollbar,
+        .rationale::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                height: 98vh;
+            }
+            
+            .section-btn {
+                min-width: 100px;
+                font-size: 0.7rem;
+                padding: 4px 8px;
+            }
+            
+            .header {
+                padding: 10px 12px;
+            }
+            
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .navigation {
+                padding: 8px 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 6px;
+            }
+            
+            .counter {
+                order: -1;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 4px;
+                font-size: 0.8rem;
+            }
+            
+            .btn {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+            }
+            
+            .question {
+                font-size: 0.85rem;
+            }
+            
+            .option {
+                font-size: 0.8rem;
+                padding: 6px 8px;
+                min-height: 40px;
+            }
+            
+            .question-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+            
+            .option-letter {
+                width: 22px;
+                height: 22px;
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (max-height: 700px) {
+            .container {
+                height: 99vh;
+            }
+            
+            .header {
+                padding: 8px 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.1rem;
+            }
+            
+            .header .subtitle {
+                font-size: 0.8rem;
+            }
+            
+            .question-container {
+                padding: 10px;
+                margin-bottom: 6px;
+            }
+            
+            .question {
+                font-size: 0.8rem;
+                line-height: 1.3;
+            }
+            
+            .option {
+                padding: 6px 8px;
+                min-height: 35px;
+                font-size: 0.75rem;
+            }
+            
+            .navigation {
+                padding: 6px 8px;
+            }
+            
+            .rationale {
+                max-height: 80px;
+                padding: 8px;
+            }
+            
+            .feedback {
+                padding: 6px 8px;
+                font-size: 0.75rem;
+            }
+            
+            .option-letter {
+                width: 20px;
+                height: 20px;
+                font-size: 0.7rem;
+            }
+            
+            .stats {
+                display: none;
+            }
+        }
+        
+        @media (max-height: 600px) {
+            .question-container {
+                padding: 8px;
+            }
+            
+            .question-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+            
+            .option {
+                min-height: 30px;
+                padding: 4px 6px;
+                font-size: 0.7rem;
+            }
+            
+            .option-letter {
+                width: 18px;
+                height: 18px;
+                font-size: 0.65rem;
+            }
+            
+            .btn {
+                padding: 5px 8px;
+                font-size: 0.7rem;
+            }
+            
+            .rationale {
+                max-height: 60px;
+                padding: 6px;
+            }
+            
+            .rationale p {
+                font-size: 0.7rem;
+                line-height: 1.3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Alzheimer's Disease and Related Disorders: Approaches to Treatment</h1>
+            <div class="subtitle">Part 1: Basic Concepts & Part 2: NCLEX-Style Practice Questions</div>
+            <div class="stats">
+                <div class="stat">📚 40 Questions Total</div>
+                <div class="stat">🎯 Immediate Feedback</div>
+                <div class="stat">💊 Pharmacology Focus</div>
+                <div class="stat">🏥 Nursing Management</div>
+            </div>
+        </div>
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="section-nav">
+            <button class="section-btn active" onclick="setSection('part1')">Part 1 (10)</button>
+            <button class="section-btn" onclick="setSection('part2')">Part 2 (30)</button>
+            <button class="section-btn" onclick="setSection('all')">All Questions (40)</button>
+        </div>
+        
+        <div class="flashcard">
+            <div class="question-container">
+                <div class="question-icon" id="questionNumber">1</div>
+                <div class="question" id="question"></div>
+                <div class="multiple-select-indicator" id="multipleSelectIndicator" style="display: none;">Multiple Answers</div>
+            </div>
+            
+            <div class="multiple-select-instructions" id="multipleSelectInstructions" style="display: none;">
+                💡 Select ALL correct answers
+            </div>
+            
+            <div class="options" id="options"></div>
+            
+            <button class="btn cancel-selection" id="cancelBtn" onclick="cancelSelection()">
+                🔄 Reset
+            </button>
+            
+            <div class="feedback" id="feedback">
+                <div class="feedback-icon" id="feedbackIcon"></div>
+                <div id="feedbackText"></div>
+            </div>
+            <div class="rationale" id="rationale">
+                <h4>💡 Rationale:</h4>
+                <p id="rationaleText"></p>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <button class="btn btn-secondary" id="prevBtn" onclick="previousCard()">
+                ⬅️ Prev
+            </button>
+            <div class="counter" id="counter">1/10</div>
+            <button class="btn btn-warning" id="submitBtn" onclick="submitAnswer()" style="display: none;">
+                ✅ Submit
+            </button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextCard()">
+                Next ➡️
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Alzheimer's Disease Data
+        const sections = {
+            'part1': [
+                {
+                    question: "What does the alternative treatment of caprylic acid act to increase?",
+                    options: ["Proteins", "Ketones", "Carbohydrates", "Glucose"],
+                    correct: 1,
+                    rationale: "Caprylic acid is a medium-chain triglyceride that is metabolized into ketone bodies. Ketones provide an alternative energy source for brain cells when glucose metabolism is impaired, a common finding in Alzheimer's disease."
+                },
+                {
+                    question: "Why should a person receiving rivastigmine (Exelon) be started at the lowest dose and then titrated up to their maintenance dose?",
+                    options: [
+                        "Starting higher can increase the likelihood of noncompliance",
+                        "It can cause severe gastrointestinal reactions",
+                        "The higher dosage can be harder to swallow",
+                        "The higher dose is more expensive"
+                    ],
+                    correct: 1,
+                    rationale: "Rivastigmine is a cholinesterase inhibitor that increases acetylcholine levels. This frequently causes nausea, vomiting, and diarrhea. Gradual dose titration reduces adverse gastrointestinal effects and improves patient tolerance."
+                },
+                {
+                    question: "Which medication classification has a black box warning for use in people with Alzheimer's disease?",
+                    options: ["Antianxiety", "Antidiarrheals", "Antipsychotics", "Anti-inflammatory"],
+                    correct: 2,
+                    rationale: "Antipsychotics carry a black box warning for increased mortality in elderly patients with dementia-related psychosis, mainly due to cardiovascular events and infections."
+                },
+                {
+                    question: "Which statement is true about Ginkgo Biloba?",
+                    options: [
+                        "It is produced by the processing of coconut oil",
+                        "It is approved by the FDA for the treatment of Alzheimer's disease",
+                        "It is derived from living organisms that grow on coral reefs",
+                        "It has potential anti-inflammatory and antioxidant effects"
+                    ],
+                    correct: 3,
+                    rationale: "Ginkgo biloba is an herbal supplement derived from the leaves of the ginkgo tree and is believed to have antioxidant and anti-inflammatory properties. It is not FDA-approved for treating Alzheimer's disease."
+                },
+                {
+                    question: "True or False: Alzheimer's disease is currently diagnosed with a blood test.",
+                    options: ["True", "False"],
+                    correct: 1,
+                    rationale: "Alzheimer's disease is diagnosed using clinical assessment, cognitive testing, patient history, and imaging studies. Blood biomarkers are emerging but are not yet used as a sole diagnostic test in routine practice."
+                },
+                {
+                    question: "What is the main neurotransmitter that cholinesterase inhibitors act on?",
+                    options: ["Serotonin", "Adrenaline", "Acetylcholine", "Norepinephrine"],
+                    correct: 2,
+                    rationale: "Cholinesterase inhibitors prevent the breakdown of acetylcholine, increasing its availability in the brain to support memory and cognitive function."
+                },
+                {
+                    question: "Which vaccine stimulates the body's immune defense of a certain protein within the brain?",
+                    options: ["CSP-1103", "H1N1", "AADvac1", "Aducanumab"],
+                    correct: 2,
+                    rationale: "AADvac1 is an experimental active immunotherapy designed to stimulate antibody production against abnormal tau protein involved in Alzheimer's disease pathology. Aducanumab is a monoclonal antibody, not a vaccine."
+                },
+                {
+                    question: "What is an intervention to help reduce anxiety in a person with Alzheimer's disease?",
+                    options: [
+                        "Create a calm environment",
+                        "Change their routine",
+                        "Increase their caffeine intake",
+                        "Discourage exercise"
+                    ],
+                    correct: 0,
+                    rationale: "A calm, predictable environment reduces confusion and sensory overload, helping decrease anxiety and agitation in individuals with Alzheimer's disease."
+                },
+                {
+                    question: "When preparing the oral solution memantine for administration, what should be used to accurately measure the correct amount?",
+                    options: [
+                        "A dosing spoon that measures cubic centimeters",
+                        "A measuring cup that displays milliliters",
+                        "A household tablespoon",
+                        "The syringe that is supplied"
+                    ],
+                    correct: 3,
+                    rationale: "The manufacturer-supplied dosing syringe provides the most accurate measurement. Household spoons or cups can result in inaccurate dosing and medication errors."
+                },
+                {
+                    question: "You are changing the rivastigmine (Exelon) patch on a person with Alzheimer's disease. What is the BEST action for you to take?",
+                    options: [
+                        "Remove the old patch prior to applying the new patch",
+                        "Leave the old patch on until the new patch has time to act",
+                        "Place the new patch on the person's upper arm",
+                        "Place the new patch in the same area as the old patch"
+                    ],
+                    correct: 0,
+                    rationale: "Removing the old patch prevents medication overdose and toxicity. Patch sites should be rotated to clean, dry, hairless skin to reduce irritation and ensure proper absorption."
+                }
+            ],
+            
+            'part2': [
+                {
+                    question: "Which medication is classified as an NMDA receptor antagonist used in Alzheimer's disease?",
+                    options: ["Donepezil", "Rivastigmine", "Galantamine", "Memantine"],
+                    correct: 3,
+                    rationale: "Memantine blocks NMDA receptors, reducing excitotoxic effects of glutamate in the brain and slowing cognitive decline in moderate to severe Alzheimer's disease."
+                },
+                {
+                    question: "Which stage of Alzheimer's disease is characterized by severe memory loss and inability to perform activities of daily living?",
+                    options: ["Early stage", "Mild stage", "Moderate stage", "Severe stage"],
+                    correct: 3,
+                    rationale: "Severe Alzheimer's disease involves profound cognitive impairment, loss of communication, and total dependence for care."
+                },
+                {
+                    question: "Which adverse effect should the nurse monitor in a patient taking donepezil?",
+                    options: ["Hypertension", "Bradycardia", "Hyperglycemia", "Urinary retention"],
+                    correct: 1,
+                    rationale: "Donepezil increases acetylcholine, which enhances parasympathetic activity and may lead to bradycardia and syncope."
+                },
+                {
+                    question: "Which nonpharmacologic intervention best supports orientation in early Alzheimer's disease?",
+                    options: [
+                        "Frequent room changes",
+                        "Use of restraints",
+                        "Orientation boards and clocks",
+                        "Limiting family visits"
+                    ],
+                    correct: 2,
+                    rationale: "Visual cues such as clocks, calendars, and orientation boards help reduce confusion and promote independence."
+                },
+                {
+                    question: "Which neurotransmitter deficit is most associated with Alzheimer's disease?",
+                    options: ["Dopamine", "Serotonin", "Acetylcholine", "Gamma-aminobutyric acid (GABA)"],
+                    correct: 2,
+                    rationale: "Alzheimer's disease is associated with degeneration of cholinergic neurons, leading to reduced acetylcholine levels."
+                },
+                {
+                    question: "Which medication requires monitoring for weight loss in Alzheimer's patients?",
+                    options: ["Memantine", "Rivastigmine", "Acetaminophen", "Aspirin"],
+                    correct: 1,
+                    rationale: "Rivastigmine commonly causes nausea, vomiting, and decreased appetite, increasing the risk of weight loss."
+                },
+                {
+                    question: "Which finding suggests progression from mild to moderate Alzheimer's disease?",
+                    options: [
+                        "Forgetting recent conversations",
+                        "Difficulty performing familiar tasks",
+                        "Occasional word-finding difficulty",
+                        "Mild short-term memory loss"
+                    ],
+                    correct: 1,
+                    rationale: "In moderate Alzheimer's disease, patients struggle with daily activities such as dressing or managing finances."
+                },
+                {
+                    question: "Which safety intervention is MOST important for a patient with Alzheimer's disease who wanders?",
+                    options: [
+                        "Encourage isolation",
+                        "Apply physical restraints",
+                        "Use door alarms and identification bracelets",
+                        "Limit fluid intake"
+                    ],
+                    correct: 2,
+                    rationale: "Safety devices reduce the risk of injury while maintaining patient dignity and autonomy."
+                },
+                {
+                    question: "Which class of medications may worsen confusion in patients with Alzheimer's disease?",
+                    options: ["Anticholinergics", "Acetylcholinesterase inhibitors", "NMDA antagonists", "Antipyretics"],
+                    correct: 0,
+                    rationale: "Anticholinergics counteract acetylcholine and can worsen cognition and confusion."
+                },
+                {
+                    question: "Which nursing intervention is appropriate during episodes of agitation?",
+                    options: [
+                        "Confront the patient with reality",
+                        "Increase environmental stimulation",
+                        "Speak calmly and redirect attention",
+                        "Administer PRN sedatives immediately"
+                    ],
+                    correct: 2,
+                    rationale: "Calm communication and redirection reduce agitation without escalating distress."
+                },
+                {
+                    question: "Which dietary consideration is appropriate for advanced Alzheimer's disease?",
+                    options: ["Encourage thin liquids", "Offer finger foods", "Restrict caloric intake", "Eliminate snacks"],
+                    correct: 1,
+                    rationale: "Finger foods promote independence and adequate nutrition when utensil use declines."
+                },
+                {
+                    question: "Which symptom is most common in early Alzheimer's disease?",
+                    options: ["Hallucinations", "Loss of bowel control", "Short-term memory loss", "Complete disorientation"],
+                    correct: 2,
+                    rationale: "Early Alzheimer's disease typically presents with impaired recent memory."
+                },
+                {
+                    question: "Which medication interaction should be avoided with cholinesterase inhibitors?",
+                    options: ["Anticholinergics", "Antipyretics", "Antacids", "Vitamin supplements"],
+                    correct: 0,
+                    rationale: "Anticholinergics oppose the therapeutic effects of cholinesterase inhibitors."
+                },
+                {
+                    question: "Which assessment finding requires immediate follow-up in a patient on donepezil?",
+                    options: ["Insomnia", "Nausea", "Syncope", "Headache"],
+                    correct: 2,
+                    rationale: "Syncope may indicate bradycardia, a serious adverse effect of cholinesterase inhibitors."
+                },
+                {
+                    question: "Which intervention best supports caregivers of patients with Alzheimer's disease?",
+                    options: [
+                        "Limiting education to reduce stress",
+                        "Encouraging caregiver support groups",
+                        "Discouraging respite care",
+                        "Avoiding discussion of disease progression"
+                    ],
+                    correct: 1,
+                    rationale: "Support groups reduce caregiver burden and improve coping and outcomes."
+                },
+                {
+                    question: "Which symptom differentiates Alzheimer's disease from normal aging?",
+                    options: [
+                        "Slower information processing",
+                        "Occasional forgetfulness",
+                        "Inability to recognize family members",
+                        "Mild difficulty multitasking"
+                    ],
+                    correct: 2,
+                    rationale: "Failure to recognize familiar people is pathological and not part of normal aging."
+                },
+                {
+                    question: "Which goal is appropriate for a patient with moderate Alzheimer's disease?",
+                    options: [
+                        "Restore previous cognitive function",
+                        "Prevent all disease progression",
+                        "Maintain safety and quality of life",
+                        "Achieve independent living"
+                    ],
+                    correct: 2,
+                    rationale: "Treatment focuses on safety, comfort, and maximizing remaining function."
+                },
+                {
+                    question: "Which behavior is expected in late-stage Alzheimer's disease?",
+                    options: ["Mild confusion only", "Wandering", "Loss of verbal communication", "Intact judgment"],
+                    correct: 2,
+                    rationale: "Late-stage Alzheimer's disease involves profound cognitive and communication deficits."
+                },
+                {
+                    question: "Which nursing diagnosis is most appropriate for a patient with Alzheimer's disease?",
+                    options: ["Acute pain", "Impaired memory", "Ineffective airway clearance", "Fluid volume excess"],
+                    correct: 1,
+                    rationale: "Memory impairment is a defining characteristic of Alzheimer's disease."
+                },
+                {
+                    question: "Which intervention reduces the risk of falls in Alzheimer's patients?",
+                    options: ["Dim lighting", "Throw rugs", "Clear pathways and adequate lighting", "Bed rest"],
+                    correct: 2,
+                    rationale: "Environmental safety modifications reduce fall risk."
+                },
+                {
+                    question: "Which statement about Alzheimer's disease progression is correct?",
+                    options: [
+                        "It can be cured with medication",
+                        "Progression varies among individuals",
+                        "Symptoms remain stable over time",
+                        "It only affects memory"
+                    ],
+                    correct: 1,
+                    rationale: "Disease progression differs based on genetics, health status, and interventions."
+                },
+                {
+                    question: "Which complication is common in advanced Alzheimer's disease?",
+                    options: ["Hypertension", "Aspiration pneumonia", "Hyperthyroidism", "Renal calculi"],
+                    correct: 1,
+                    rationale: "Dysphagia and immobility increase aspiration risk."
+                },
+                {
+                    question: "Which approach is best when communicating with an Alzheimer's patient?",
+                    options: [
+                        "Use complex sentences",
+                        "Speak loudly and quickly",
+                        "Use simple, clear language",
+                        "Correct all incorrect statements"
+                    ],
+                    correct: 2,
+                    rationale: "Simple communication reduces confusion and anxiety."
+                },
+                {
+                    question: "Which factor increases the risk of Alzheimer's disease?",
+                    options: ["Young age", "Sedentary lifestyle", "Advanced age", "High calcium intake"],
+                    correct: 2,
+                    rationale: "Age is the strongest known risk factor for Alzheimer's disease."
+                },
+                {
+                    question: "Which intervention best manages sleep disturbances in Alzheimer's disease?",
+                    options: [
+                        "Daytime napping",
+                        "Establishing a bedtime routine",
+                        "Late-night caffeine",
+                        "Restraining the patient"
+                    ],
+                    correct: 1,
+                    rationale: "Consistent routines promote better sleep patterns."
+                },
+                {
+                    question: "Which symptom suggests delirium rather than Alzheimer's disease?",
+                    options: [
+                        "Gradual memory loss",
+                        "Sudden onset of confusion",
+                        "Progressive decline",
+                        "Long-term cognitive impairment"
+                    ],
+                    correct: 1,
+                    rationale: "Delirium presents acutely and is often reversible."
+                },
+                {
+                    question: "Which outcome indicates effective Alzheimer's disease management?",
+                    options: [
+                        "Cure of disease",
+                        "Stable behavior and reduced agitation",
+                        "Complete memory restoration",
+                        "Independence in late-stage disease"
+                    ],
+                    correct: 1,
+                    rationale: "Management aims to control symptoms and improve quality of life."
+                },
+                {
+                    question: "Which nursing intervention addresses impaired nutrition?",
+                    options: [
+                        "Limit mealtime duration",
+                        "Provide frequent small meals",
+                        "Restrict protein intake",
+                        "Encourage fasting"
+                    ],
+                    correct: 1,
+                    rationale: "Small, frequent meals improve intake and tolerance."
+                },
+                {
+                    question: "Which sign suggests adverse effects of memantine?",
+                    options: ["Hypertension", "Dizziness", "Bradycardia", "Diarrhea"],
+                    correct: 1,
+                    rationale: "Memantine commonly causes dizziness and headache."
+                },
+                {
+                    question: "Which statement reflects appropriate family education?",
+                    options: [
+                        "Alzheimer's disease progression is predictable",
+                        "Medications cure the disease",
+                        "Behavioral changes are part of the illness",
+                        "Symptoms can be fully reversed"
+                    ],
+                    correct: 2,
+                    rationale: "Education helps families understand and cope with disease-related behaviors."
+                }
+            ],
+            
+            'all': []
+        };
+
+        // Combine all questions for the 'all' section
+        sections['all'] = [
+            ...sections['part1'].map(q => ({...q, section: 'part1'})),
+            ...sections['part2'].map(q => ({...q, section: 'part2'}))
+        ];
+
+        let currentSection = 'part1';
+        let currentQuestion = 0;
+        let selectedOption = null;
+        let isSubmitted = false;
+        let answers = {
+            'part1': Array(sections['part1'].length).fill(null),
+            'part2': Array(sections['part2'].length).fill(null),
+            'all': Array(sections['all'].length).fill(null)
+        };
+
+        function setSection(section) {
+            currentSection = section;
+            currentQuestion = 0;
+            selectedOption = null;
+            isSubmitted = false;
+            
+            document.querySelectorAll('.section-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            loadQuestion();
+        }
+
+        function getCurrentQuestionData() {
+            if (currentSection === 'all') {
+                return sections['all'][currentQuestion] || null;
+            } else {
+                return sections[currentSection][currentQuestion];
+            }
+        }
+
+        function loadQuestion() {
+            const questionData = getCurrentQuestionData();
+            
+            if (!questionData) return;
+            
+            // Update UI elements visibility
+            document.getElementById('multipleSelectIndicator').style.display = 'none';
+            document.getElementById('multipleSelectInstructions').style.display = 'none';
+            document.getElementById('cancelBtn').classList.remove('show');
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('questionNumber').textContent = currentQuestion + 1;
+            
+            let totalQuestions = getTotalQuestions();
+            
+            const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('counter').textContent = `${currentQuestion + 1}/${totalQuestions}`;
+            
+            document.getElementById('question').textContent = questionData.question;
+            loadOptions(questionData);
+            
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('rationale').classList.remove('show');
+            
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            const isLastQuestion = currentQuestion >= totalQuestions - 1;
+            document.getElementById('nextBtn').textContent = isLastQuestion ? 'Finish ➡️' : 'Next ➡️';
+            document.getElementById('nextBtn').disabled = true;
+            
+            // Load saved answer state
+            const storedAnswer = answers[currentSection][currentQuestion];
+            if (storedAnswer !== null) {
+                selectedOption = storedAnswer;
+                highlightSelectedOption(storedAnswer, questionData);
+                showFeedback(storedAnswer, questionData);
+                document.getElementById('nextBtn').disabled = false;
+                document.getElementById('cancelBtn').classList.add('show');
+            } else {
+                selectedOption = null;
+                isSubmitted = false;
+            }
+        }
+
+        function loadOptions(questionData) {
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            if (questionData.options && questionData.options.length > 0) {
+                questionData.options.forEach((option, index) => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'option';
+                    optionElement.innerHTML = `
+                        <div class="option-letter">${String.fromCharCode(65 + index)}</div>
+                        <div class="option-text">${option}</div>
+                    `;
+                    optionElement.onclick = () => selectOption(index, questionData);
+                    optionsContainer.appendChild(optionElement);
+                });
+            }
+        }
+
+        function selectOption(index, questionData) {
+            if (!questionData) questionData = getCurrentQuestionData();
+            
+            answers[currentSection][currentQuestion] = index;
+            selectedOption = index;
+            
+            highlightSelectedOption(index, questionData);
+            showFeedback(index, questionData);
+            document.getElementById('nextBtn').disabled = false;
+            document.getElementById('cancelBtn').classList.add('show');
+        }
+
+        function highlightSelectedOption(index, questionData) {
+            if (!questionData) questionData = getCurrentQuestionData();
+            
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach((option, i) => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+                
+                if (i === index) {
+                    if (i === questionData.correct) {
+                        option.classList.add('correct');
+                    } else {
+                        option.classList.add('incorrect');
+                        options[questionData.correct].classList.add('correct');
+                    }
+                }
+            });
+        }
+
+        function showFeedback(index, questionData) {
+            if (!questionData) questionData = getCurrentQuestionData();
+            
+            const feedback = document.getElementById('feedback');
+            const feedbackIcon = document.getElementById('feedbackIcon');
+            const feedbackText = document.getElementById('feedbackText');
+            const rationale = document.getElementById('rationale');
+            const rationaleText = document.getElementById('rationaleText');
+            
+            if (index === questionData.correct) {
+                feedback.className = 'feedback correct';
+                feedbackIcon.textContent = '✅';
+                feedbackText.textContent = 'Correct! Well done.';
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedbackIcon.textContent = '❌';
+                const correctLetter = String.fromCharCode(65 + questionData.correct);
+                feedbackText.textContent = `Incorrect. Correct: ${correctLetter}`;
+            }
+            
+            feedback.style.display = 'flex';
+            rationaleText.textContent = questionData.rationale;
+            rationale.classList.add('show');
+        }
+
+        function cancelSelection() {
+            const questionData = getCurrentQuestionData();
+            
+            answers[currentSection][currentQuestion] = null;
+            selectedOption = null;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('rationale').classList.remove('show');
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('cancelBtn').classList.remove('show');
+        }
+
+        function nextCard() {
+            const totalQuestions = getTotalQuestions();
+            
+            if (currentQuestion < totalQuestions - 1) {
+                currentQuestion++;
+                selectedOption = null;
+                isSubmitted = false;
+                loadQuestion();
+            } else {
+                let correctCount = 0;
+                let totalAnswered = 0;
+                
+                Object.keys(answers).forEach(section => {
+                    answers[section].forEach((answer, index) => {
+                        if (answer !== null) {
+                            totalAnswered++;
+                            const questionData = getQuestionData(section, index);
+                            if (answer === questionData?.correct) correctCount++;
+                        }
+                    });
+                });
+                
+                alert(`Quiz completed!\n\nAnswered: ${totalAnswered}\nCorrect: ${correctCount}\n\nClick OK to restart.`);
+                
+                currentSection = 'part1';
+                currentQuestion = 0;
+                selectedOption = null;
+                isSubmitted = false;
+                answers = {
+                    'part1': Array(sections['part1'].length).fill(null),
+                    'part2': Array(sections['part2'].length).fill(null),
+                    'all': Array(sections['all'].length).fill(null)
+                };
+                
+                setSection('part1');
+            }
+        }
+
+        function previousCard() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                selectedOption = answers[currentSection][currentQuestion];
+                loadQuestion();
+            }
+        }
+
+        function getTotalQuestions() {
+            if (currentSection === 'all') {
+                return sections['all'].length;
+            } else {
+                return sections[currentSection].length;
+            }
+        }
+
+        function getQuestionData(section, index) {
+            if (section === 'all') {
+                return sections['all'][index];
+            } else {
+                return sections[section][index];
+            }
+        }
+
+        // Initialize
+        setSection('part1');
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.key >= '1' && event.key <= '4') {
+                const index = parseInt(event.key) - 1;
+                const questionData = getCurrentQuestionData();
+                selectOption(index, questionData);
+            } else if (event.key >= 'a' && event.key <= 'd') {
+                const index = event.key.charCodeAt(0) - 97;
+                const questionData = getCurrentQuestionData();
+                selectOption(index, questionData);
+            } else if (event.key === 'ArrowLeft') {
+                if (!document.getElementById('prevBtn').disabled) {
+                    previousCard();
+                }
+            } else if (event.key === 'ArrowRight') {
+                if (!document.getElementById('nextBtn').disabled) {
+                    nextCard();
+                }
+            } else if (event.key === ' ' || event.key === 'Spacebar') {
+                if (!document.getElementById('nextBtn').disabled) {
+                    nextCard();
+                }
+            } else if (event.key === 'Escape') {
+                cancelSelection();
+            }
+        });
+    </script>
+</body>
+</html>
